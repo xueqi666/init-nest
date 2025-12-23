@@ -1,3 +1,4 @@
+import { Logs } from './../logs/logs.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
@@ -7,6 +8,7 @@ import { Repository } from 'typeorm';
 export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(Logs) private logsRepository: Repository<Logs>,
   ) {}
 
   async create(user: User) {
@@ -48,12 +50,40 @@ export class UserService {
 
   // 关联查询 user and logs
   async findUserWithLogs(id: number) {
-    let user = await this.userRepository.find({
-      where: { id: id },
-      relations: {
-        logs: true,
-      },
-    });
+    // let user = await this.userRepository.find({
+    //   where: { id: id },
+    //   relations: {
+    //     logs: true,
+    //   },
+    // });
+    // let user = this.userRepository
+    //   .createQueryBuilder('user')
+    //   .addSelect('logs')
+    //   .addSelect('user.id', 'userId')
+    //   .addSelect('user.username', 'userName')
+    //   .leftJoin('user.logs', 'logs')
+    //   .getRawMany();
+    let user = this.userRepository
+      .createQueryBuilder('user')
+      .innerJoinAndSelect('user.logs', 'logs')
+      .getMany();
     return user;
+  }
+
+  // 查询 logs 数量Result
+  async countUserLogs(id: number) {
+    let countResult = this.logsRepository
+      .createQueryBuilder('logs')
+      .select('COUNT(logs.result)', 'count')
+      .addSelect('logs.result', 'result')
+      .where('logs.result IS NOT NULL')
+      .andWhere("logs.result <> ''")
+      .groupBy('logs.result')
+      .getRawMany();
+    // let countResult = this.logsRepository.query(
+    //   'SELECT * FROM logs INNER JOIN  user ON logs.userId = user.id',
+    // );
+
+    return countResult;
   }
 }

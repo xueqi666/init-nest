@@ -1,8 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as dotenv from 'dotenv';
+import { Logger } from '@nestjs/common';
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  let logger = new Logger();
+  const app = await NestFactory.create(AppModule, {
+    // 关闭整个日志
+    // logger: false,
+    // logger: ['error', 'warn'],
+  });
   app.enableCors({
     origin: '*', // 或指定域名：["http://localhost:3000"]
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
@@ -14,5 +19,6 @@ async function bootstrap() {
 
   await app.listen(process.env.WEB_PROT ?? 3000);
   console.log('process.env.PORT:', process.env.WEB_PROT);
+  logger.error(`App端口 ${process.env.WEB_PROT}`);
 }
 bootstrap();

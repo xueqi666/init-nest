@@ -32,10 +32,15 @@ export class UserController {
     console.log('print ~ UserController ~ findOneUserProfile ~ user:', user);
     return user;
   }
-  @Get('findOneUserLogs')
-  async findOneUserProfile2() {
+  @Get('findUserLogs')
+  async findUserLogs() {
     let user = await this.UserService.findUserWithLogs(1);
     console.log('print ~ UserController ~ findOneUserProfile ~ user:', user);
     return user;
+  }
+  @Get('countUserLogs')
+  async countUserLogs() {
+    let count = await this.UserService.countUserLogs(1);
+    return count;
   }
 }
