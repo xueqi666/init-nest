@@ -1,9 +1,13 @@
 import { Module } from '@nestjs/common';
-import { UserModule } from './user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import Configuration from './configuration';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import * as dayjs from 'dayjs';
+import { LoggerModule } from 'nestjs-pino';
+import { join } from 'path';
+import Configuration from './configuration';
 import { LogsModule } from './logs/logs.module';
+import { UserModule } from './user/user.module';
+import { EchartsModule } from './echarts/echarts.module';
 
 const envFilePath = `.env.${process.env.NODE_ENV || 'dev'}`;
 @Module({
@@ -31,6 +35,7 @@ const envFilePath = `.env.${process.env.NODE_ENV || 'dev'}`;
         logging: false,
       }),
     }),
+    EchartsModule,
   ],
 })
 export class AppModule {}

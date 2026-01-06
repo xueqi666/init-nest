@@ -1,26 +1,29 @@
+import { Controller, Get, Post, RequestTimeoutException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { UserService } from './user.service';
-import { Controller, Get, Post } from '@nestjs/common';
-import { ConfigEnum } from 'src/enum/config.enum';
-import { log } from 'node:console';
 import { User } from './user.entity';
+import { UserService } from './user.service';
 
 @Controller('user')
 export class UserController {
+  // private logger = new Logger(UserController.name);
   constructor(
-    private UserService: UserService,
-    private ConfigService: ConfigService,
-  ) {}
+    private userService: UserService,
+    private configService: ConfigService,
+  ) {
+    // this.logger.error(`Connecting to `);
+  }
   @Get('all')
   getUserAll() {
-    let userList = this.UserService.findAll();
-
+    let host = this.configService.get('DB');
+    console.log('print ~ UserController ~ getUserAll ~ host:', host);
+    throw new RequestTimeoutException('Request Timeout');
+    let userList = this.userService.findAll();
     return userList;
   }
 
   @Post('create')
   postAddUser() {
-    let userList = this.UserService.create({
+    let userList = this.userService.create({
       username: 'admin',
       password: '123456',
     } as User);
@@ -28,19 +31,19 @@ export class UserController {
   }
   @Get('findOneUserProfile')
   async findOneUserProfile() {
-    let user = await this.UserService.findUserWithProfile(1);
+    let user = await this.userService.findUserWithProfile(1);
     console.log('print ~ UserController ~ findOneUserProfile ~ user:', user);
     return user;
   }
   @Get('findUserLogs')
   async findUserLogs() {
-    let user = await this.UserService.findUserWithLogs(1);
+    let user = await this.userService.findUserWithLogs(1);
     console.log('print ~ UserController ~ findOneUserProfile ~ user:', user);
     return user;
   }
   @Get('countUserLogs')
   async countUserLogs() {
-    let count = await this.UserService.countUserLogs(1);
+    let count = await this.userService.countUserLogs(1);
     return count;
   }
 }

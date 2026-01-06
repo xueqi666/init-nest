@@ -1,6 +1,7 @@
+import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { Logger } from '@nestjs/common';
+import { AllExceptionFilter } from './filters/all-exception';
 async function bootstrap() {
   let logger = new Logger();
   const app = await NestFactory.create(AppModule, {
@@ -17,8 +18,11 @@ async function bootstrap() {
   //设置全局前缀
   // app.setGlobalPrefix('api');
 
+  // app.useGlobalFilters(new HttpExceptionFilter());
+
+  app.useGlobalFilters(new AllExceptionFilter());
   await app.listen(process.env.WEB_PROT ?? 3000);
-  console.log('process.env.PORT:', process.env.WEB_PROT);
-  logger.error(`App端口 ${process.env.WEB_PROT}`);
+
+  logger.log(`App端口 localhost:${process.env.WEB_PROT}`);
 }
 bootstrap();

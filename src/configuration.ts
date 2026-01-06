@@ -1,7 +1,7 @@
-import { readFileSync } from 'node:fs';
 import * as yaml from 'js-yaml';
-import * as path from 'node:path';
 import * as _ from 'lodash';
+import { readFileSync } from 'node:fs';
+import * as path from 'node:path';
 // 读取配置默认配置文件名称
 const YAML_CONFIG_FILENAME_DEFAULT = 'env.yml';
 const YAML_FILE_PATH_DEFAULT = path.resolve(
