@@ -10,7 +10,7 @@ import { Logger as PinoLogger } from 'nestjs-pino';
 import * as HttpRequestIp from 'request-ip';
 @Catch()
 export class AllExceptionFilter implements ExceptionFilter {
-  private readonly logger = new Logger();
+  private readonly logger = new Logger(AllExceptionFilter.name);
   constructor(private PinoLogger?: PinoLogger) {}
   catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();

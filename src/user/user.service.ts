@@ -1,8 +1,9 @@
-import { Logs } from './../logs/logs.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './user.entity';
 import { Repository } from 'typeorm';
+import { Logs } from './../logs/logs.entity';
+import { UserQuery } from './dto/get-user-dto';
+import { User } from './user.entity';
 
 @Injectable()
 export class UserService {
@@ -11,10 +12,23 @@ export class UserService {
     @InjectRepository(Logs) private logsRepository: Repository<Logs>,
   ) {}
 
-  async create(user: User) {
+  async create(user: UserQuery) {
     const tmpUser = this.userRepository.create(user);
     let newUser = await this.userRepository.save(tmpUser);
     return newUser;
+  }
+
+  //登录
+  async getLogin(dot: UserQuery) {
+    const user = await this.userRepository.findOne({
+      where: {
+        username: dot.username,
+        password: dot.password,
+      },
+    });
+    console.log('print ~ UserService ~ getLogin ~ user:122', user);
+
+    return user;
   }
   async delete(id: number) {
     return this.userRepository.delete(id);
@@ -85,5 +99,23 @@ export class UserService {
     // );
 
     return countResult;
+  }
+  async findUserWithProfileWithLogs(query: UserQuery) {
+    let queryBuilder = this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.profile', 'profile')
+      .leftJoinAndSelect('user.logs', 'logs');
+
+    let obj = {
+      'profile.age': query.age,
+      'logs.status': query.status,
+    };
+    Object.keys(obj).forEach((key) => {
+      if (obj[key]) {
+        queryBuilder.andWhere(`${key} = :${key}`, { [key]: obj[key] });
+      }
+    });
+
+    return queryBuilder;
   }
 }

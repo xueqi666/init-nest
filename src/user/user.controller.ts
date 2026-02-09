@@ -1,11 +1,10 @@
-import { Controller, Get, Post, RequestTimeoutException } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Post, Query } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { User } from './user.entity';
+import { CreactUserDto, LoginUserDto, UserQuery } from './dto/get-user-dto';
 import { UserService } from './user.service';
-
 @Controller('user')
 export class UserController {
-  // private logger = new Logger(UserController.name);
+  private logger = new Logger(UserController.name);
   constructor(
     private userService: UserService,
     private configService: ConfigService,
@@ -14,20 +13,32 @@ export class UserController {
   }
   @Get('all')
   getUserAll() {
-    let host = this.configService.get('DB');
-    console.log('print ~ UserController ~ getUserAll ~ host:', host);
-    throw new RequestTimeoutException('Request Timeout');
     let userList = this.userService.findAll();
     return userList;
   }
 
   @Post('create')
-  postAddUser() {
-    let userList = this.userService.create({
-      username: 'admin',
-      password: '123456',
-    } as User);
-    return userList;
+  async postAddUser(@Body() dot: CreactUserDto) {
+    this.logger.log('print ~ UserController ~ postAddUser ~ dot:', dot);
+    return this.userService.create(dot);
+  }
+  @Post('login')
+  async getLogin(@Body() dot: LoginUserDto) {
+    let user = await this.userService.getLogin(dot);
+    console.log('print ~ UserController ~ getLogin ~ user:', user);
+    if (user) {
+      return {
+        code: 200,
+        msg: '登录成功',
+        data: user,
+      };
+    } else {
+      return {
+        code: 400,
+        msg: '登录失败',
+        data: null,
+      };
+    }
   }
   @Get('findOneUserProfile')
   async findOneUserProfile() {
@@ -45,5 +56,15 @@ export class UserController {
   async countUserLogs() {
     let count = await this.userService.countUserLogs(1);
     return count;
+  }
+
+  @Get('userWithProfileWithLogs')
+  async getUserWithProfileWithLogs(@Query() query: UserQuery) {
+    console.log(
+      'print ~ UserController ~ getUserWithProfileWithLogs ~ query:',
+      query,
+    );
+    let user = await this.userService.findUserWithProfileWithLogs(query);
+    return user;
   }
 }

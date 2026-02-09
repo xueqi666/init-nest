@@ -1,13 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import * as dayjs from 'dayjs';
-import { LoggerModule } from 'nestjs-pino';
-import { join } from 'path';
 import Configuration from './configuration';
+import { EchartsModule } from './echarts/echarts.module';
 import { LogsModule } from './logs/logs.module';
 import { UserModule } from './user/user.module';
-import { EchartsModule } from './echarts/echarts.module';
+import { RoleModule } from './role/role.module';
 
 const envFilePath = `.env.${process.env.NODE_ENV || 'dev'}`;
 @Module({
@@ -16,7 +14,7 @@ const envFilePath = `.env.${process.env.NODE_ENV || 'dev'}`;
     LogsModule,
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath, // 读取简单的配置变量 ,env 文件
+      envFilePath: [envFilePath, '.env'],
       load: [Configuration], // 读取复杂配置变量 config文件夹下的
     }),
     TypeOrmModule.forRootAsync({
@@ -36,6 +34,7 @@ const envFilePath = `.env.${process.env.NODE_ENV || 'dev'}`;
       }),
     }),
     EchartsModule,
+    RoleModule,
   ],
 })
 export class AppModule {}
